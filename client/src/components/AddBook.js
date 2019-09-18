@@ -1,8 +1,18 @@
 import React,{Component} from 'react';
-import {graphql} from 'react-apollo';
+import {graphql, withApollo} from 'react-apollo';
 import {compose} from "redux";
 import {getAuthorsQuery, getBooksQuery} from '../queries/queries';
 import {addBookMutation} from '../mutation/mutations';
+import {gql} from 'apollo-boost'
+
+const authorOne = gql`
+  {
+    authors @client {
+        name
+    }
+  }
+`
+
 
 class AddBook extends Component {
     constructor(props){
@@ -42,9 +52,10 @@ class AddBook extends Component {
     }
     render() {
         console.log('authors data is',this.props.data);
+        const {client} = this.props
         return (
                 <form action="" id='add-book' onSubmit={this.handleSubmit}>
-                    <div className='field'>
+                    <div onClick={e => console.log("authorOne", client.readQuery({query:authorOne}))} className='field'>
                         <label htmlFor="book name">Book name</label>
                         <input type="text" onChange={ e=>{this.setState({name:e.target.value})}}/>
                     </div>
@@ -68,4 +79,4 @@ class AddBook extends Component {
 export default compose(
     graphql(getAuthorsQuery,{name:"getAuthorsQuery"}),
     graphql(addBookMutation,{name:"addBookMutation"})
-)(AddBook);
+)(withApollo(AddBook));
